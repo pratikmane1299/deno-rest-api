@@ -9,7 +9,7 @@ for deno based on [**Koa**](https://github.com/koajs/koa).
 
 **Clone the repo**
 ```bash
-- git clone https://github.com/pratikman1299/deno-rest-api.git
+- git clone https://github.com/pratikmane1299/deno-rest-api.git
 - cd deno-rest-api
 ```
 
