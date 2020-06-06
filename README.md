@@ -4,6 +4,7 @@ for deno based on [**Koa**](https://github.com/koajs/koa).
 
 ## Requirements
 - **Deno** : https://deno.land/#installation
+- **Mongo DB** : https://docs.mongodb.com/manual/installation/
 
 ## Getting Started
 
