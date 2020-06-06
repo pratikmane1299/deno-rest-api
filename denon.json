@@ -2,10 +2,13 @@
   "$schema": "https://deno.land/x/denon/schema.json",
   "scripts": {
     "start": {
-      "cmd": "deno run server.ts",
+      "cmd": "deno run --unstable server.ts",
       "desc": "Starts the server",
       "allow": [
-        "net"
+        "net",
+        "write",
+        "read",
+        "plugin"
       ]
     }
   }

@@ -1,11 +1,14 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import Post from './../types/post.type.ts';
+import { db, posts } from './../dbConnect.ts';
 
-let posts: Post[] = [];
+//let posts: Post[] = [];
 
-const getAllPosts = ({ response }: { response: any }) => {
+const getAllPosts = async ({ response }: { response: any }) => {
 
-    if (posts.length === 0) {
+    const allPosts = await posts.find();
+
+    if (allPosts.length === 0) {
         response.status = 404;
         response.body = {
             success: false,
@@ -15,14 +18,15 @@ const getAllPosts = ({ response }: { response: any }) => {
         response.status = 200;
         response.body = {
             success: true,
-            posts
+            posts: allPosts
         }
     }
-    
+
 }
 
-const getSinglePost = ({ params, response }: { params: { id: string }, response: any }) => {
-    const post = getPostById(params.id);
+const getSinglePost = async ({ params, response }: { params: { id: string }, response: any }) => {
+
+    const post = await getPostById(params.id);
 
     if (post) {
         response.status = 200
@@ -40,7 +44,7 @@ const getSinglePost = ({ params, response }: { params: { id: string }, response:
 }
 
 const addPost = async ({ request, response }: { request: any, response: any }) => {
-    const body = await request.body();
+    /* const body = await request.body();
 
     if (!request.hasBody) {
         response.status = 400;
@@ -58,6 +62,30 @@ const addPost = async ({ request, response }: { request: any, response: any }) =
             success: true,
             post
         }
+    } */
+
+    const body = await request.body();
+
+    if (!request.hasBody) {
+        response.status = 400;
+        response.body = {
+            success: false,
+            message: 'Post data not found in request'
+        }
+    } else {
+        const post = body.value;
+
+        const id = posts.insertOne({
+            title: post.title,
+            content: post.content,
+            author: post.author
+        })
+
+        response.status = 201;
+        response.body = {
+            success: true,
+            post: { ...post, ...id }
+        }
     }
 }
 
@@ -70,7 +98,7 @@ const updatePost = async ({ request, response, params }: { request: any, respons
         }
     } else {
         const body = await request.body();
-        let post = getPostById(params.id);
+        let post = await getPostById(params.id);
         if (!post) {
             response.status = 400;
             response.body = {
@@ -80,8 +108,9 @@ const updatePost = async ({ request, response, params }: { request: any, respons
         } else {
             const data: { title?: string, content?: string, author?: string } = body.value;
 
-            posts = posts.map(p => p.id === params.id ? { ...p, ...data } : p)
-            post = getPostById(params.id);
+            const { matchedCount, modifiedCount, upsertedId } = await posts.updateOne({ _id: { "$oid": params.id }}, data);
+            
+            post = await getPostById(params.id);
             
             response.status = 200;
             response.body = {
@@ -92,8 +121,8 @@ const updatePost = async ({ request, response, params }: { request: any, respons
     }
 }
 
-const deletePost = ({ params, response }: { params: { id: string }, response: any }) => {
-    const post = getPostById(params.id);
+const deletePost = async ({ params, response }: { params: { id: string }, response: any }) => {
+    const post = await getPostById(params.id);
 
     if (!post) {
         response.status = 400
@@ -102,18 +131,27 @@ const deletePost = ({ params, response }: { params: { id: string }, response: an
             message: 'Post for the given id not found'
         }
     } else {
-        posts = posts.filter(p => p.id !== params.id);
-        
-        response.status = 200;
-        response.body = {
-            success: true,
-            message: 'Post with the given id deleted'
+
+        const deleteCount = await posts.deleteOne({ _id: { "$oid": params.id } });
+
+        if (deleteCount === 1) {
+            response.status = 200;
+            response.body = {
+                success: true,
+                message: 'Post with the given id deleted'
+            }
+        } else {
+            response.status = 500;
+            response.body = {
+                success: true,
+                message: 'Internal server error'
+            }
         }
     }
 }
 
 const getPostById = (id: string) => {
-    return posts.find(p => p.id === id);
+    return posts.findOne({ _id: { "$oid": id } });
 }
 
 export { getAllPosts, getSinglePost, addPost, updatePost, deletePost }
