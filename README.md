@@ -16,7 +16,7 @@ for deno based on [**Koa**](https://github.com/koajs/koa).
 
 **Setting Environment Variables**
 
-Create a .evn in the root of the project
+Create a .env in the root of the project
 
 ```sh
 # .env
