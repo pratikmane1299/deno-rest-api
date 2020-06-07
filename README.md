@@ -14,6 +14,17 @@ for deno based on [**Koa**](https://github.com/koajs/koa).
 - cd deno-rest-api
 ```
 
+**Setting Environment Variables**
+
+Create a .evn in the root of the project
+
+```sh
+# .env
+PORT=<Server Port>
+MONGO_DB_URI=<Mongodb url>
+MONGO_DB_NAME=<Database Name>
+```
+
 **Running the project**
 ```bash
 denon start
