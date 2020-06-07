@@ -1,10 +1,10 @@
 # Deno Rest Api 🦕
 It's a simple rest api developed with [**Deno**](https://deno.land/) and [**Oak**](https://github.com/oakserver/oak) which is a framework
-for deno based on [**Koa**](https://github.com/koajs/koa).
+for deno based on [**Koa**](https://github.com/koajs/koa) and [**MongoDB**](https://www.mongodb.com/).
 
 ## Requirements
 - **Deno** : https://deno.land/#installation
-- **Mongo DB** : https://docs.mongodb.com/manual/installation/
+- **MongoDB** : https://docs.mongodb.com/manual/installation/
 
 ## Getting Started
 
