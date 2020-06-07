@@ -1,1 +1,7 @@
+# Environment Variables
+
+.env
+
+# Deno Plugins
+
 .deno_plugins/
