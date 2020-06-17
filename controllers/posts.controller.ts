@@ -1,8 +1,9 @@
 import { posts } from './../dbConnect.ts';
 import RequestError from './../utils/requestError.ts';
+import { Post } from './../types/post.type.ts';
 
 const getAllPosts = async ({ response }: { response: any }) => {
-    let allPosts;
+    let allPosts: Post[] = [];
     try {
         allPosts = await posts.find();
     } catch (err) {
@@ -15,17 +16,24 @@ const getAllPosts = async ({ response }: { response: any }) => {
         throw error;
 
     } else {
+        const posts =  allPosts.map(post => {
+            return {
+                ...post,
+                _id: post._id.$oid
+            }
+        });
+
         response.status = 200;
         response.body = {
             success: true,
-            posts: allPosts
+            posts
         };
     }
 }
 
 const getSinglePost = async ({ params, response }: { params: { id: string }, response: any }) => {
 
-    let post;
+    let post: Post;
 
     try {
         post = await getPostById(params.id);
@@ -37,7 +45,7 @@ const getSinglePost = async ({ params, response }: { params: { id: string }, res
         response.status = 200
         response.body = {
             success: true,
-            post
+            post: { ...post, _id: post._id.$oid }
         }
     } else {
         const error = new Error('Post for the given id not found') as RequestError
@@ -56,18 +64,20 @@ const addPost = async ({ request, response }: { request: any, response: any }) =
             error.status = 400
             throw error
         } else {
-            const post = body.value;
+            const data = body.value;
 
             const id = await posts.insertOne({
-                title: post.title,
-                content: post.content,
-                author: post.author
+                title: data.title,
+                content: data.content,
+                author: data.author
             });
+
+            const post: Post = { _id: id.$oid, ...data };
 
             response.status = 201;
             response.body = {
                 success: true,
-                post: { ...post, ...id }
+                post
             };
         }
     } catch (err) {
